@@ -4,6 +4,10 @@
 
 using namespace std;
 
+string FindPlayerName(string names[], bool playerTurn);
+void GetUserName(string players[]);
+int AskMove(bool player1Turn, int chipsInPile, string names[]);
+
 const int MAX_CHIPS = 100;
 const float MAX_TURN = 0.5;
 
@@ -15,67 +19,30 @@ int main()
   int maxPerTurn = 0;
   char nextGame = 'N';
   string playerName[2] = {"Tim", "Tom"};
-
-  /*
-  cout << "Player 1, enter your name\t:";
-  cin >> playerName[0];
-  cout << "Player 2, enter your name\t:";
-  cin >> playerName[1];
-  */
-
+  
+  //seed the random number generator
   srand(time(0));
+
+  //read usernames
+  GetUserName(playerName);
 
   do
   {
     bool player1Turn = true;
     bool gameOver = false;
     chipsInPile = (rand() % MAX_CHIPS) + 1;
-    maxPerTurn = (chipsInPile * MAX_TURN);
-    cout << "Game started with " << chipsInPile << " chips" << endl;
+    cout << "Game started with " << chipsInPile << " chips \n" << endl;
     
     while( gameOver == false)
     {
-
-      do
-      {
-        if(player1Turn)
-        {
-          cout << playerName[0] << ", How many chips would you like ..? " <<endl;
-        }
-        else
-        {
-          cout << playerName[1] << ", How many chips would you like ..? " <<endl;
-        }
-       // do 
-        //{
-          cout << "You can take maximum of ";
-          if ( static_cast<int>(chipsInPile * MAX_TURN) == 0)
-          {
-            cout << "1" << endl;
-          }
-          else
-          {
-            cout << static_cast<int>(chipsInPile * MAX_TURN) << endl;
-          }
-          cin >> chipsTaken;
-          
-        //} while (chipsTaken > static_cast<int>(chipsInPile * MAX_TURN));
-      } while ( (chipsTaken > maxPerTurn) && chipsInPile > 1);
-      
+      chipsTaken = AskMove(player1Turn, chipsInPile, playerName);
       chipsInPile = chipsInPile - chipsTaken;
-      cout << "There are " << chipsInPile << " left in the Pile" << endl;
+      cout << "There are " << chipsInPile << " left in the Pile\n" << endl;
 
       if (chipsInPile == 0)
       {
         gameOver = true;
-        if(player1Turn)
-        {
-          cout << playerName[1] << ", You Won..!!! " <<endl;
-        }
-        else
-        {
-          cout << playerName[0] << ", You Won..!!! " <<endl;
-        }
+        cout << FindPlayerName(playerName, !player1Turn)  << ", You Won..!!! " <<endl;
       }
       else
       {
@@ -85,8 +52,51 @@ int main()
     cout << "Do you want to start a new game...? " << endl;
     cout << "Press Y or N :\t";
     cin >> nextGame;
-  } while( (nextGame == 'Y') || (nextGame == 'y') );
+    nextGame = toupper(nextGame);
+  } while (nextGame == 'Y');
   
 
   return 0;
+}
+
+string FindPlayerName(string names[], bool playerTurn)
+{
+  if (playerTurn == true)
+    return names[0];
+  else
+    return names[1];
+}
+
+void GetUserName(string players[])
+{
+  cout << "Player 1, enter your name\t:";
+  cin >> players[0];
+  cout << "Player 2, enter your name\t:";
+  cin >> players[1];
+}
+
+int AskMove(bool player1Turn, int chipsInPile, string names[])
+{
+  int chipsTaken;
+  int maxPerTurn = MAX_TURN * chipsInPile;
+  do
+      {
+        cout << FindPlayerName(names, player1Turn) << ", How many chips would you like ..? " <<endl;
+
+       // do 
+        //{
+          cout << "You can take maximum of ";
+          if ( maxPerTurn == 0)
+          {
+            cout << "1" << endl;
+          }
+          else
+          {
+            cout << maxPerTurn << endl;
+          }
+          cin >> chipsTaken;
+          
+        //} while (chipsTaken > static_cast<int>(chipsInPile * MAX_TURN));
+      } while ( (chipsTaken > maxPerTurn) && (chipsInPile > 1) );
+      return chipsTaken;
 }
